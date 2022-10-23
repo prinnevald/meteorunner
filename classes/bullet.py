@@ -1,4 +1,5 @@
 import pygame
+from classes.explosion import Explosion
 
 class Bullet(pygame.sprite.Sprite):
 
@@ -18,12 +19,15 @@ class Bullet(pygame.sprite.Sprite):
 
 
     def move(self):
-        self.posY -= self.speed
-        self.update()
+        if self.posY > 0:
+            self.posY -= self.speed
+            self.update()
+            return False
+        return True
 
 
-    def getPosition(self):
-        return self.posY
+    def explode(self):
+        return Explosion((self.posX, self.posY))
 
 
     def update(self):

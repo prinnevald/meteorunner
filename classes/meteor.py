@@ -16,18 +16,17 @@ class Meteor(pygame.sprite.Sprite):
         self.rect = self.image.get_rect(center = pos)
 
 
-    def move(self):
-        # self.angle += self.angularSpeed
-        self.posY += self.speed
-        self.update()
+    def move(self, windowHeight):
+        if self.posY < windowHeight:
+            # self.angle += self.angularSpeed
+            self.posY += self.speed
+            self.update()
+            return False
+        return True
 
 
     def getWidth(self):
         return self.image.get_width()
-
-
-    def getPosition(self):
-        return self.posY
 
     
     def update(self):

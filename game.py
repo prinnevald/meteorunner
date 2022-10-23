@@ -26,11 +26,15 @@ group.add(player)
 # to update (movement or whatever)
 bullets = pygame.sprite.Group()
 
-
 # meteors group. Created for the same reason as bullets
 meteors = pygame.sprite.Group()
 meteorReload = 100
 meteorTick = 1
+
+# explosions group to cycle through frames
+explosions = pygame.sprite.Group()
+explosionFrame = 120
+explosionTick = 6
 
 
 # the Game Loop
@@ -64,16 +68,8 @@ while True:
     if player.isAutofire() or keys[pygame.K_SPACE]:
         if player.ready():
             bullets.add(player.shoot())
-
-
-    # updating bullets
-    for bullet in bullets.sprites():
-        if bullet.getPosition() > 0:
-            bullet.move()
-        else:
-            bullets.remove(bullet)
-
     
+
     # meteors logic
     if meteorReload < 0:
         meteors.add(Meteor((randint(0, windowWidth), 0)))
@@ -82,27 +78,32 @@ while True:
         meteorReload -= meteorTick
 
 
-    # updating meteors
+    # updating meteors, explosions and bullet movement
     for meteor in meteors.sprites():
-        if meteor.getPosition() < windowHeight:
-            meteor.move()
-        else:
+        if meteor.move(windowHeight):
             meteors.remove(meteor)
+
+    for explosion in explosions.sprites():
+        if explosion.update():
+            explosions.remove(explosion)
+
+    for bullet in bullets.sprites():
+        if bullet.move():
+            bullets.remove(bullet)
 
 
     # collisions
     for bullet in bullets:
-        collided_bullets = pygame.sprite.spritecollide(bullet, meteors, True)
-        if len(collided_bullets) > 0:
-            # bullet.explode()
+        ifcollided = pygame.sprite.spritecollide(bullet, meteors, True)
+        if len(ifcollided) > 0:
+            explosions.add(bullet.explode())
             bullets.remove(bullet)
-        # bullet.explode()
-        #for deleteIt in collided_bullets:
-        #    bullets.remove(deleteIt)
+
 
     # displaying everything on screen
     screen.fill((0,0,0))
 
+    explosions.draw(screen)
     meteors.draw(screen)
     bullets.draw(screen)
     group.draw(screen)
